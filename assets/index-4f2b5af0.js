@@ -45,7 +45,7 @@ Error generating stack: `+o.message+`
   justify-content: center;
   transform: translateX(-25%);
   max-width: 80%;
-  max-height: 90vh;
+  max-height: 700px;
   position: relative;
 `,P0=Se.div`
   height: 100vh;
