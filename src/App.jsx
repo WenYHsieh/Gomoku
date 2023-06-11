@@ -1,18 +1,39 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 
+const GameWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  transform: translateX(-25%);
+  max-width: 80%;
+  max-height: 90vh;
+  position: relative;
+`
+
 const Game = styled.div`
   height: 100vh;
   position: relative;
   background-color: slate;
-  overflow: hidden;
 `
 const ControlPanel = styled.div`
-  width: 630px;
   display: flex;
-  margin: 20px auto;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  margin-top: 20px;
+  padding: 8px;
+`
+const HistoryPanel = styled.ul`
+  width: 100%;
+  height: 500px;
+  margin-top: 20px;
+  background: rgb(211, 211, 211, 0.3);
+  overflow-y: auto;
+`
+
+const Record = styled.li`
+  border-bottom: 1px solid rgb(211, 211, 211, 0.6);
+  background: slate;
+  padding: 8px 16px;
 `
 
 const Status = styled.span`
@@ -23,18 +44,14 @@ const Status = styled.span`
 `
 
 const BoardContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -48%);
+  top: 50px;
+  left: 50px;
   border: 3px solid #2b2b2b;
   box-shadow: 15px 10px 15px -4px rgba(0, 0, 0, 0.75);
   ${(props) => {
     if (props.$type === 'grid')
-      return `left: calc(50%);  border: 2px solid black;  box-shadow:none; `
+      return `left: calc(50px + 20px); top: calc(50px + 20px);  border: 2px solid black;  box-shadow:none; `
   }}
 `
 
@@ -51,10 +68,26 @@ const Cell = styled.div`
   justify-content: center;
   cursor: pointer;
   position: relative;
+  outline: transparent;
+  transition: 0.4s;
+
+  &:hover {
+    outline: 3px solid #00ffff;
+  }
 
   ${(props) => {
     if (props.$type === 'grid')
       return ` border-color: #2b2b2b; background-color:transparent`
+  }};
+`
+
+const SideLabel = styled.label`
+  color: gray;
+  font-size: 11px;
+
+  ${(props) => {
+    if (props.$type === 'col') return `transform: translateY(-35px)`
+    if (props.$type === 'row') return `transform: translateX(-35px) `
   }};
 `
 
@@ -71,11 +104,11 @@ const Chessman = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   ${(props) => {
-    if (props.$isChessmanWinner) return `box-shadow: -1px 2px 5px 3px #f7ff00`
+    if (props.$isChessmanWinner) return `box-shadow: 0px 0px 5px 3px #00ffff`
   }}
 `
 const GameoverBanner = styled.div`
-  width: 100%;
+  width: 100vw;
   height: 0px;
   font-size: 50px;
   color: white;
@@ -83,8 +116,8 @@ const GameoverBanner = styled.div`
   line-height: 200px;
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  left: 25%;
+  transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 2;
   overflow: hidden;
@@ -110,25 +143,35 @@ const initialState = Array(15).fill(Array(15).fill(null))
 
 const App = () => {
   const [board, setBoard] = useState(initialState)
-  const [isBlackTurn, setIsBlackTurn] = useState(true)
+  const [isBlackTurn, setIsBlackTurn] = useState(Math.random() > 0.5)
   const [winnerData, setWinnerData] = useState({
     winner: null,
     coordinations: new Array(),
   })
+  const [history, setHistory] = useState(new Array())
 
   const handleClick = (rowIndex, colIndex) => {
     if (board[rowIndex][colIndex] || winnerData?.winner) {
       return
     }
 
+    const chessType = isBlackTurn ? 'BLACK' : 'WHITE'
     const updatedBoard = board.map((row, i) =>
       i === rowIndex
-        ? row.map((value, j) =>
-            j === colIndex ? (isBlackTurn ? 'BLACK' : 'WHITE') : value
-          )
+        ? row.map((value, j) => (j === colIndex ? chessType : value))
         : row
     )
 
+    setHistory((history) => {
+      const lastItem = history[history.length - 1]?.split('.')
+      const lastIndex = lastItem ? parseInt(lastItem[0]) + 1 : 1
+      return [
+        ...history,
+        `${lastIndex}. [${rowIndex + 1}, ${String.fromCharCode(
+          colIndex + 65
+        )}]: ${chessType} `,
+      ]
+    })
     setBoard(updatedBoard)
     setIsBlackTurn(!isBlackTurn)
     checkWinner(updatedBoard, rowIndex, colIndex)
@@ -191,10 +234,12 @@ const App = () => {
 
   const handleRestartGame = () => {
     setBoard(initialState)
+    setIsBlackTurn(Math.random() > 0.5)
     setWinnerData({
       winner: null,
       coordinations: new Array(),
     })
+    setHistory(new Array())
   }
 
   const isSubarrayIn2DArray = (subarray, array) => {
@@ -215,6 +260,12 @@ const App = () => {
               key={colIndex}
               onClick={() => handleClick(rowIndex, colIndex)}
             >
+              <SideLabel $type='col'>
+                {rowIndex === 0 && String.fromCharCode(colIndex + 65)}
+              </SideLabel>
+              <SideLabel $type='row'>
+                {colIndex === 0 && rowIndex + 1}
+              </SideLabel>
               {value && (
                 <Chessman
                   color={value === 'BLACK' ? '#000000' : '#ffff'}
@@ -241,26 +292,26 @@ const App = () => {
 
   return (
     <>
-      <Game>
+      <GameWrapper>
         <GameoverBanner $winner={winnerData?.winner}>
           Game Over... The Winner is {winnerData?.winner} !
         </GameoverBanner>
         <ControlPanel>
           <Status>{'Next player: ' + (isBlackTurn ? 'black' : 'white')}</Status>
           <ResetBtn onClick={handleRestartGame}>RESTART</ResetBtn>
+          <HistoryPanel>
+            {history?.map((data) => {
+              return <Record key={data}>{data}</Record>
+            })}
+          </HistoryPanel>
         </ControlPanel>
-        <BoardContainer $type='grid'>{renderGrid()}</BoardContainer>
-        <BoardContainer>{renderBoard()}</BoardContainer>
-      </Game>
+        <Game>
+          <BoardContainer $type='grid'>{renderGrid()}</BoardContainer>
+          <BoardContainer>{renderBoard()}</BoardContainer>
+        </Game>
+      </GameWrapper>
     </>
   )
 }
 
 export default App
-
-/**
- * 悔棋
- * 紀錄每一步
- * 回朔每一步
- *
- */
