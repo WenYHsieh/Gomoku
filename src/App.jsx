@@ -3,8 +3,7 @@ import styled from 'styled-components'
 
 const GameWrapper = styled.div`
   display: flex;
-  justify-content: center;
-  transform: translateX(-25%);
+  margin: 0 50px 0 50px;
   max-width: 80%;
   max-height: 700px;
   position: relative;
