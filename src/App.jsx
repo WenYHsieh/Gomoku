@@ -6,7 +6,7 @@ const GameWrapper = styled.div`
   margin: 0 50px 0 50px;
   max-width: 80%;
   max-height: 700px;
-  position: relative;
+  /* position: relative; */
 `
 
 const Game = styled.div`
@@ -115,7 +115,7 @@ const GameoverBanner = styled.div`
   line-height: 200px;
   position: absolute;
   top: 50%;
-  left: 25%;
+  right: 0;
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 2;
