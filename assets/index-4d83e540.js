@@ -45,7 +45,6 @@ Error generating stack: `+o.message+`
   margin: 0 50px 0 50px;
   max-width: 80%;
   max-height: 700px;
-  position: relative;
 `,P0=Se.div`
   height: 100vh;
   position: relative;
@@ -101,7 +100,7 @@ Error generating stack: `+o.message+`
   color: gray;
   font-size: 11px;
 
-  ${e=>{if(e.$type==="col")return"transform: translateY(-35px)";if(e.$type==="row")return"transform: translateX(-35px) "}};
+  ${e=>{if(e.$type==="col")return"transform: translateY(-35px)";if(e.$type==="row")return"transform: translateX(-35px)"}};
 `,R0=Se.div`
   width: 30px;
   height: 30px;
@@ -124,7 +123,7 @@ Error generating stack: `+o.message+`
   line-height: 200px;
   position: absolute;
   top: 50%;
-  left: 25%;
+  right: 0;
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 2;
