@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import styled from 'styled-components'
+import { keyframes } from 'styled-components'
 
 const GameWrapper = styled.div`
   display: flex;
@@ -57,6 +58,11 @@ const Row = styled.div`
   display: flex;
 `
 
+const breatheAnimation = keyframes`
+ 0% { outline: 3px solid #d4f9f9 }
+ 50% { outline: 3px solid #93ffff }
+ 100% { outline: 3px solid #00ffff }
+`
 const Cell = styled.div`
   width: 40px;
   height: 40px;
@@ -70,7 +76,7 @@ const Cell = styled.div`
   transition: 0.4s;
 
   &:hover {
-    outline: 3px solid #00ffff;
+    animation: 0.8s infinite alternate ease-out ${breatheAnimation};
   }
 
   ${(props) => {
